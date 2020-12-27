@@ -37,15 +37,25 @@ class HalfCheetahVelEnv(HalfCheetahEnv):
 
         forward_vel = (xposafter - xposbefore) / self.dt
         forward_reward = -1.0 * abs(forward_vel - self.goal_velocity)
+        sparse_reward = self.sparsify_rewards(forward_reward)
         ctrl_cost = 0.5 * 1e-1 * np.sum(np.square(action))
 
         observation = self._get_obs()
-        reward = forward_reward - ctrl_cost
+        reward = sparse_reward - ctrl_cost
         done = False
         infos = dict(reward_forward=forward_reward,
                      reward_ctrl=-ctrl_cost,
                      task=self.get_task())
         return observation, reward, done, infos
+
+    def sparsify_rewards(self, r):
+        ''' zero out rewards when outside the goal radius '''
+        #mask = (r >= -self.goal_radius).astype(np.float32)
+        #r = r * mask
+        if r < - 0.5:
+            r = -2
+        r = r + 2
+        return r
 
     def set_task(self, task):
         self.goal_velocity = task

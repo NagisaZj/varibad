@@ -14,17 +14,60 @@ from utils.common.vec_env import VecEnvWrapper
 from utils.common.vec_env.dummy_vec_env import DummyVecEnv
 from utils.common.vec_env.subproc_vec_env import SubprocVecEnv
 from utils.common.vec_env.vec_normalize import VecNormalize as VecNormalize_
+from metaworld.benchmarks import ML1
 
+class MetaWorldMask(gym.Wrapper):
+
+    def step(self, action):
+        obs, rew, done, info = self.env.step(action)
+
+        if not info['success']:
+            rew = 0
+        info['task']=0
+
+        return obs, rew, done, info
+
+    def reset(self, **kwargs):
+        return self.env.reset(**kwargs)
+
+    def get_task(self):
+        return self.env.tasks_pool[np.random.randint(0,50)]
+
+    def sample_task(self):
+        return self.env.tasks_pool[np.random.randint(0,50)]
+
+    def reset_task(self, task):
+        if task is None:
+            task = self.sample_task()
+        self.env.set_task(task)
 
 def make_env(env_id, seed, rank, log_dir, allow_early_resets,
              episodes_per_task, **kwargs):
     def _thunk():
-        env = gym.make(env_id, **kwargs)
-        if seed is not None:
-            env.seed(seed + rank)
+        if not 'metaworld' in env_id:
+            env = gym.make(env_id, **kwargs)
+            if seed is not None:
+                env.seed(seed + rank)
 
-        if str(env.__class__.__name__).find('TimeLimit') >= 0:
-            env = TimeLimitMask(env)
+            if str(env.__class__.__name__).find('TimeLimit') >= 0:
+                env = TimeLimitMask(env)
+        else:
+            available_tasks = ML1.available_tasks()
+            print(available_tasks)
+            env = ML1.get_train_tasks(available_tasks[16])
+            print(env)
+            env._max_episode_steps=150
+            tasks = env.sample_tasks(50)
+            env.tasks_pool = tasks
+
+            def get_task():
+                return self.tasks_pool[np.random.randint(0, 50)]
+            env.get_task=get_task
+            env=MetaWorldMask(env)
+            #def reset_task():
+            #    pass
+            #env.reset_task = reset_task
+
 
         env = VariBadWrapper(env=env, episodes_per_task=episodes_per_task)
 

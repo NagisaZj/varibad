@@ -12,17 +12,31 @@ class AntGoalEnv(AntEnv):
         self.task_dim = 2
         super(AntGoalEnv, self).__init__()
 
+
+
+    def sparsify_rewards(self, r):
+        ''' zero out rewards when outside the goal radius '''
+        #mask = (r >= -self.goal_radius).astype(np.float32)
+        #r = r * mask
+        if r < -self.goal_radius:
+            r = -2
+        r = r + 2
+        return r
+
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         xposafter = np.array(self.get_body_com("torso"))
 
-        goal_reward = -np.sum(np.abs(xposafter[:2] - self.goal_pos))  # make it happy, not suicidal
+        goal_reward = -np.sum(np.abs(xposafter[:2] - self._goal)) # make it happy, not suicidal
 
         ctrl_cost = .1 * np.square(action).sum()
         contact_cost = 0.5 * 1e-3 * np.sum(
             np.square(np.clip(self.sim.data.cfrc_ext, -1, 1)))
         survive_reward = 0.0
         reward = goal_reward - ctrl_cost - contact_cost + survive_reward
+        sparse_reward = self.sparsify_rewards(reward) - ctrl_cost - contact_cost + survive_reward
+        #reward = sparse_reward
+        # make sparse rewards positive
         state = self.state_vector()
         done = False
         ob = self._get_obs()

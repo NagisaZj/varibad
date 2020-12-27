@@ -25,8 +25,22 @@ register(
     'AntGoal-v0',
     entry_point='environments.wrappers:mujoco_wrapper',
     kwargs={'entry_point': 'environments.mujoco.ant_goal:AntGoalEnv',
-            'max_episode_steps': 200},
-    max_episode_steps=200
+            'max_episode_steps': 64},
+    max_episode_steps=64
+)
+register(
+    'Reacher-v0',
+    entry_point='environments.wrappers:mujoco_wrapper',
+    kwargs={'entry_point': 'environments.mujoco.reacher_goal:ReacherGoalEnv',
+            'max_episode_steps': 64},
+    max_episode_steps=64
+)
+register(
+    'Walker-v0',
+    entry_point='environments.wrappers:mujoco_wrapper',
+    kwargs={'entry_point': 'environments.mujoco.walker_vel:WalkerSparseEnv',
+            'max_episode_steps': 64},
+    max_episode_steps=64
 )
 
 register(
@@ -41,8 +55,23 @@ register(
     'HalfCheetahVel-v0',
     entry_point='environments.wrappers:mujoco_wrapper',
     kwargs={'entry_point': 'environments.mujoco.half_cheetah_vel:HalfCheetahVelEnv',
-            'max_episode_steps': 200},
-    max_episode_steps=200
+            'max_episode_steps': 64},
+    max_episode_steps=64
+)
+register(
+    'Point-v0',
+    entry_point='environments.wrappers:mujoco_wrapper',
+    kwargs={'entry_point': 'environments.mujoco.point_robot:SparsePointEnv',
+            'max_episode_steps': 32},
+    max_episode_steps=32
+)
+
+register(
+    'PointSub-v0',
+    entry_point='environments.wrappers:mujoco_wrapper',
+    kwargs={'entry_point': 'environments.mujoco.point_robot:SparsePointSubEnv',
+            'max_episode_steps': 32},
+    max_episode_steps=32
 )
 
 # - randomised dynamics
@@ -50,7 +79,7 @@ register(
 register(
     id='Walker2DRandParams-v0',
     entry_point='environments.mujoco.rand_param_envs.walker2d_rand_params:Walker2DRandParamsEnv',
-    max_episode_steps=200
+    max_episode_steps=64
 )
 
 register(

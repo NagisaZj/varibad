@@ -61,6 +61,7 @@ class MetaLearner:
         self.vae = VaribadVAE(self.args, self.logger, lambda: self.iter_idx)
 
         self.initialise_policy()
+        self.return_mem = []
 
     def initialise_policy(self):
 
@@ -135,6 +136,7 @@ class MetaLearner:
 
         # reset environments
         (prev_obs_raw, prev_obs_normalised) = self.envs.reset()
+
         prev_obs_raw = prev_obs_raw.to(device)
         prev_obs_normalised = prev_obs_normalised.to(device)
 
@@ -145,6 +147,8 @@ class MetaLearner:
 
         vae_is_pretrained = False
         for self.iter_idx in range(self.args.num_updates):
+            #print(self.envs.venv.unwrapped.[0]._goal)
+            #print(self.envs[0].unwrapped._goal)
 
             # First, re-compute the hidden states given the current rollouts (since the VAE might've changed)
             # compute latent embedding (will return prior if current trajectory is empty)
@@ -386,6 +390,8 @@ class MetaLearner:
             print("Updates {}, num timesteps {}, FPS {}, {} \n Mean return (train): {:.5f} \n".
                   format(self.iter_idx, self.frames, int(self.frames / (time.time() - start_time)),
                          self.vae.rollout_storage.prev_obs.shape, returns_avg[-1].item()))
+            self.return_mem.append(returns_avg[k].data.cpu().numpy())
+            np.save(self.logger.full_output_folder+'/returns.npy',self.return_mem)
 
         # --- save models ---
 

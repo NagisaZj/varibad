@@ -1,39 +1,26 @@
 import numpy as np
-
-from environments.mujoco.rand_param_envs.base import RandomEnv
-from environments.mujoco.rand_param_envs.gym import utils
-
+from rand_param_envs.base import RandomEnv
+from rand_param_envs.gym import utils
 
 class Walker2DRandParamsEnv(RandomEnv, utils.EzPickle):
     def __init__(self, log_scale_limit=3.0):
-        self._max_episode_steps = 64
-        self._elapsed_steps = -1  # the thing below takes one step
         RandomEnv.__init__(self, log_scale_limit, 'walker2d.xml', 5)
         utils.EzPickle.__init__(self)
 
     def _step(self, a):
-        a = np.clip(a,-1,1)
         posbefore = self.model.data.qpos[0, 0]
         self.do_simulation(a, self.frame_skip)
         posafter, height, ang = self.model.data.qpos[0:3, 0]
-        alive_bonus = 0.0
+        alive_bonus = 1.0
         reward = ((posafter - posbefore) / self.dt)
         reward += alive_bonus
-        dist = abs(reward-1.5)
-        if dist>0.5:
+        if reward < 1.5:
             reward = 0
-        else:
-            reward = 0.8-dist
         reward -= 1e-3 * np.square(a).sum()
         done = not (height > 0.8 and height < 2.0 and
                     ang > -1.0 and ang < 1.0)
         ob = self._get_obs()
-        self._elapsed_steps += 1
-        info = {'task': self.get_task()}
-        if self._elapsed_steps == self._max_episode_steps:
-            done = True
-            info['bad_transition'] = True
-        return ob, reward, done, info
+        return ob, reward, done, {}
 
     def _get_obs(self):
         qpos = self.model.data.qpos
@@ -46,11 +33,6 @@ class Walker2DRandParamsEnv(RandomEnv, utils.EzPickle):
             self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.model.nv)
         )
         return self._get_obs()
-
-    def _reset(self):
-        ob = super()._reset()
-        self._elapsed_steps = 0
-        return ob
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 2
@@ -69,3 +51,4 @@ if __name__ == "__main__":
         for _ in range(100):
             env.render()
             env.step(env.action_space.sample())  # take a random action
+

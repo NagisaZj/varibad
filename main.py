@@ -16,7 +16,9 @@ from config.mujoco import \
     args_mujoco_cheetah_dir_oracle, args_mujoco_cheetah_dir_rl2, args_mujoco_cheetah_dir_varibad, \
     args_mujoco_cheetah_vel_oracle, args_mujoco_cheetah_vel_rl2, args_mujoco_cheetah_vel_varibad, \
     args_mujoco_ant_dir_oracle, args_mujoco_ant_dir_rl2, args_mujoco_ant_dir_varibad, \
-    args_mujoco_walker_oracle, args_mujoco_walker_rl2, args_mujoco_walker_varibad
+    args_mujoco_walker_oracle, args_mujoco_walker_rl2, args_mujoco_walker_varibad,\
+    args_mujoco_racher_goal_varibad,args_mujoco_walker_vel_varibad,args_mujoco_point_varibad,args_mujoco_point_sub_varibad,\
+args_metaworld_varibad
 from learner import Learner
 from metalearner import MetaLearner
 
@@ -64,6 +66,17 @@ def main():
         args = args_mujoco_cheetah_vel_rl2.get_args(rest_args)
     elif env == 'mujoco_cheetah_vel_varibad':
         args = args_mujoco_cheetah_vel_varibad.get_args(rest_args)
+    elif env == 'mujoco_reacher_varibad':
+        args = args_mujoco_racher_goal_varibad.get_args(rest_args)
+    elif env == 'mujoco_walker_vel_varibad':
+        args = args_mujoco_walker_vel_varibad.get_args(rest_args)
+    elif env == 'mujoco_point_varibad':
+        args = args_mujoco_point_varibad.get_args(rest_args)
+    elif env == 'mujoco_point_sub_varibad':
+        args = args_mujoco_point_sub_varibad.get_args(rest_args)
+    elif env == 'mujoco_metaworld_varibad':
+        args = args_metaworld_varibad.get_args(rest_args)
+
     #
     # - Walker -
     elif env == 'mujoco_walker_oracle':

@@ -12,15 +12,15 @@ def get_args(rest_args):
 
     # training parameters
     parser.add_argument('--num_frames', type=int, default=1e8, help='number of frames to train')
-    parser.add_argument('--max_rollouts_per_task', type=int, default=4)
+    parser.add_argument('--max_rollouts_per_task', type=int, default=2)
 
     # variBAD
     parser.add_argument('--exp_label', default='varibad', help='label for the experiment')
     parser.add_argument('--disable_varibad', type=boolean_argument, default=False,
-                        help='Train a normal policy without the variBAD architecture')
+                        help='Train policy w/o variBAD architecture')
 
     # env
-    parser.add_argument('--env_name', default='AntGoal-v0', help='environment to train on')
+    parser.add_argument('--env_name', default='Walker-v0', help='environment to train on')
     parser.add_argument('--norm_obs_for_policy', type=boolean_argument, default=True,
                         help='normalise env observations (for policy)')
     parser.add_argument('--norm_rew_for_policy', type=boolean_argument, default=True,
@@ -42,8 +42,8 @@ def get_args(rest_args):
     parser.add_argument('--ppo_use_huberloss', type=boolean_argument, default=True,
                         help='use huber loss instead of MSE')
     parser.add_argument('--ppo_use_clipped_value_loss', type=boolean_argument, default=True,
-                        help='clip the value loss in ppo')
-    parser.add_argument('--ppo_clip_param', type=float, default=0.05, help='clamp param')
+                        help='use huber loss instead of MSE')
+    parser.add_argument('--ppo_clip_param', type=float, default=0.1, help='clamp param')
 
     # other hyperparameters
     parser.add_argument('--lr_policy', type=float, default=7e-4, help='learning rate (default: 7e-4)')
@@ -77,7 +77,8 @@ def get_args(rest_args):
     parser.add_argument('--kl_weight', type=float, default=1.0, help='weight for the KL term')
     parser.add_argument('--precollect_len', type=int, default=0,
                         help='how many frames to pre-collect before training begins')
-    parser.add_argument('--pretrain_len', type=int, default=0, help='for how many updates to pre-train the VAE')
+    parser.add_argument('--pretrain_len', type=int, default=0,
+                        help='for how many updates to pre-train the VAE (done with the frames from precollect-len)')
 
     # - encoder
     parser.add_argument('--latent_dim', type=int, default=5, help='dimensionality of latent space')

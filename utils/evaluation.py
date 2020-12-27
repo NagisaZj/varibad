@@ -110,6 +110,7 @@ def visualise_behaviour(args,
                         compute_state_reconstruction_loss=None,
                         compute_kl_loss=None,
                         ):
+    return
     # initialise environment
     env = make_vec_envs(env_name=args.env_name,
                         seed=args.seed * 42 + iter_idx,
